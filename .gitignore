@@ -1,0 +1,27 @@
+# system files
+.DS_Store
+Thumbs.db
+
+# nativescript
+/hooks
+/node_modules
+/platforms
+/lib
+
+app/**/*.js
+app/**/*.d.ts
+app/**/*.map
+app/**/*.css
+
+# misc
+npm-debug.log
+
+# app
+!app/assets/font-awesome.min.css
+/report/
+.nsbuildinfo
+/temp/
+/app/tns_modules/
+
+# app uses platform specific scss which can inadvertently get renamed which will cause problems
+app/app.scss

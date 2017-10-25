@@ -1,0 +1,23 @@
+// SASS theme setup: https://docs.nativescript.org/ui/theme#sass-usage
+
+// customized variables
+@import 'variables';
+// theme standard rulesets
+@import '~nativescript-theme-core/scss/index';
+// define our custom styles here...
+
+Page {
+  /**
+    * should be set to your app's common/overall background-color
+    * will help prevent white flashes when changing routes
+    * sample app uses a white background so just using $white here
+    **/
+  background-color: $white;
+}
+
+/**
+  * any font icons you may use, define the global class for the font
+  **/
+.fa {
+	font-family: 'FontAwesome', fontawesome-webfont;
+}

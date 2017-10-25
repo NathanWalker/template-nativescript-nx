@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "declaration": false,
+      // for live dev: ensures shared libs get helpers since we are targeting es5 (ie., __assign helper)
+      "noEmitHelpers": false,
+      "removeComments": false,
+      "noEmitOnError": true,
+      "lib": [
+        "es2017",
+        "dom"
+      ],
+      "baseUrl": ".",
+      "paths": {
+        "*": [
+          "./node_modules/tns-core-modules/*",
+          "./node_modules/*"
+        ]
+      },
+      "skipLibCheck": true,
+    },
+    "include": [
+      "references.d.ts",
+      "app/main.ts",
+      "app/**/*.module.ts"
+    ]
+  }
+  

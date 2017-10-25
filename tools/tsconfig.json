@@ -6,8 +6,10 @@
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "declaration": false,
+
       // for live dev: ensures shared libs get helpers since we are targeting es5 (ie., __assign helper)
       "noEmitHelpers": false,
+
       "removeComments": false,
       "noEmitOnError": true,
       "lib": [
@@ -21,7 +23,7 @@
           "./node_modules/*"
         ]
       },
-      "skipLibCheck": true,
+      "skipLibCheck": true
     },
     "include": [
       "references.d.ts",

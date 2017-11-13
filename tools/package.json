@@ -60,7 +60,7 @@
         "nativescript-worker-loader": "~0.8.1",
         "raw-loader": "~0.5.1",
         "resolve-url-loader": "~2.1.0",
-        "tns-platform-declarations": "~3.3.0",
+        "tns-platform-declarations": "next",
         "typescript": "file:../../node_modules/typescript",
         "webpack": "~3.8.1",
         "webpack-bundle-analyzer": "~2.9.0",

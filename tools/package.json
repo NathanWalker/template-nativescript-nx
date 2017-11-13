@@ -33,6 +33,7 @@
         "@angular/forms": "file:../../node_modules/@angular/forms",
         "@angular/http": "file:../../node_modules/@angular/http",
         "@angular/platform-browser": "file:../../node_modules/@angular/platform-browser",
+        "@angular/platform-browser-dynamic": "file:../../node_modules/@angular/platform-browser-dynamic",
         "@angular/router": "file:../../node_modules/@angular/router",
         "@ngrx/effects": "file:../../node_modules/@ngrx/effects",
         "@ngrx/router-store": "file:../../node_modules/@ngrx/router-store",

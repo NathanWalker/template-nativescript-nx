@@ -40,7 +40,7 @@
         "@ngrx/store": "file:../../node_modules/@ngrx/store",
         "@nrwl/nx": "file:../../node_modules/@nrwl/nx",
         "nativescript-angular": "next",
-        "nativescript-ngx-fonticon": "^3.0.0",
+        "nativescript-ngx-fonticon": "~4.0.0",
         "nativescript-theme-core": "~1.0.2",
         "reflect-metadata": "~0.1.8",
         "rxjs": "file:../../node_modules/rxjs",

@@ -38,12 +38,12 @@
         "@ngrx/router-store": "file:../../node_modules/@ngrx/router-store",
         "@ngrx/store": "file:../../node_modules/@ngrx/store",
         "@nrwl/nx": "file:../../node_modules/@nrwl/nx",
-        "nativescript-angular": "~4.4.0",
+        "nativescript-angular": "next",
         "nativescript-ngx-fonticon": "^3.0.0",
         "nativescript-theme-core": "~1.0.2",
         "reflect-metadata": "~0.1.8",
         "rxjs": "file:../../node_modules/rxjs",
-        "tns-core-modules": "~3.2.0",
+        "tns-core-modules": "~3.3.0",
         "zone.js": "file:../../node_modules/zone.js"
     },
     "devDependencies": {
@@ -59,7 +59,7 @@
         "nativescript-worker-loader": "~0.8.1",
         "raw-loader": "~0.5.1",
         "resolve-url-loader": "~2.1.0",
-        "tns-platform-declarations": "^3.2.0",
+        "tns-platform-declarations": "~3.3.0",
         "typescript": "file:../../node_modules/typescript",
         "webpack": "~3.8.1",
         "webpack-bundle-analyzer": "~2.9.0",

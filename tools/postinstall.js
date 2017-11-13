@@ -12,7 +12,7 @@ getPackageJson()
         console.error(err);
     })
     .then(() => {
-        console.log("NativeScript for Nx is finalizing...");
+        console.log("3. NativeScript for Nx is finalizing...");
         // Remove tools folder including this script
         deleteFolderSync(__dirname);
     });
@@ -86,7 +86,7 @@ function getNxRootFolder() {
 
 function cleanupPackage(packageJsonData) {
     return new Promise((resolve, reject) => {
-        console.log("Cleaning up...");
+        console.log("2. Cleaning up.");
 
         const { packageJson, packageJsonPath } = packageJsonData;
 

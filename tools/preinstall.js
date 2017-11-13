@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const exec = require("child_process").exec;
 
-console.log("Preparing NativeScript for Nx...");
+console.log("1. Preparing NativeScript for Nx.");
 
 const filesToCopy = ["references.d.ts", "tsconfig.aot.json", "tsconfig.json", "webpack.config.js"];
 

@@ -27,10 +27,10 @@
         "v8Flags": "--expose_gc"
     },
     "dependencies": {
-        "tns-core-modules": "next"
+        "tns-core-modules": "~3.4.0"
     },
     "devDependencies": {
-        "tns-platform-declarations": "next"
+        "tns-platform-declarations": "~3.4.0"
     },
     "scripts": {
         "preinstall": "node tools/preinstall.js",

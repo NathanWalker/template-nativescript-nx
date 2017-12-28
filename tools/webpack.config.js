@@ -1,4 +1,4 @@
-const { resolve, join  } = require('path');
+const { resolve, join } = require('path');
 
 const webpack = require('webpack');
 const nsWebpack = require('nativescript-dev-webpack');
@@ -8,240 +8,164 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { NativeScriptWorkerPlugin } = require('nativescript-worker-loader/NativeScriptWorkerPlugin');
 
-const { AotPlugin } = require('@ngtools/webpack');
-
-const ngToolsWebpackOptions = { tsConfigPath: 'tsconfig.aot.json' };
-
 const os = require('os');
 const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
-
-const mainSheet = `app.css`;
+const dropDownMangleExcludes = require('nativescript-drop-down/uglify-mangle-excludes').default;
+const cacheBusterTimestamp = Date.now().toString(36);
 
 module.exports = env => {
-    const platform = getPlatform(env);
+  const platform = env && (env.android && 'android' || env.ios && 'ios');
+  if ( !platform ) {
+    throw new Error('You need to provide a target platform!');
+  }
+  const platforms = ['ios', 'android'];
+  const ngToolsWebpackOptions = { tsConfigPath: 'tsconfig.aot.json' };
+  const { snapshot, uglify, report, aot } = env;
 
-    // Default destination inside platforms/<platform>/...
-    const path = resolve(nsWebpack.getAppPath(platform));
+  const config = {
+    context: resolve('./app'),
+    target: nativescriptTarget,
+    entry: {
+      bundle: aot ? './main.aot.ts' : './main.ts',
+      vendor: './vendor',
+    },
+    output: {
+      pathinfo: true,
+      // Default destination inside platforms/<platform>/...
+      path: resolve(nsWebpack.getAppPath(platform)),
+      libraryTarget: 'commonjs2',
+      filename: `[name]_${cacheBusterTimestamp}.js`,
+      chunkFilename: '[id].[chunkhash].js',
+    },
+    resolve: {
+      extensions: ['.ts', '.js', '.scss', '.css'],
+      // Resolve {N} system modules from tns-core-modules
+      modules: [
+        'node_modules/tns-core-modules',
+        'node_modules',
+      ],
+      alias: {
+        '~': resolve('./app')
+      },
+      // don't resolve symlinks to symlinked modules
+      // symlinks: false
+    },
+    resolveLoader: {
+      // don't resolve symlinks to symlinked loaders
+      symlinks: false
+    },
+    node: {
+      // Disable node shims that conflict with NativeScript
+      'http': false,
+      'timers': false,
+      'setImmediate': false,
+      'fs': 'empty',
+    },
+    module: {
+      rules: [
+        { test: /\.html$|\.xml$/, use: 'raw-loader' },
 
-    const entry = {
-        // Discover entry module from package.json
-        bundle: `./${nsWebpack.getEntryModule()}`,
+        // tns-core-modules reads the app.css and its imports using css-loader
+        { test: /\/app\.css$/, use: 'css-loader?url=false' },
+        { test: /\/app\.scss$/, use: ['css-loader?url=false', 'sass-loader'] },
 
-        // Vendor entry with third-party libraries
-        vendor: `./vendor`,
-
-        // Entry for stylesheet with global application styles
-        [mainSheet]: `./app.${platform}.css`,
-    };
-
-    const rules = getRules();
-    const plugins = getPlugins(platform, env);
-    const extensions = getExtensions(platform);
-
-    const config = {
-        context: resolve('./app'),
-        target: nativescriptTarget,
-        entry,
-        output: {
-            pathinfo: true,
-            path,
-            libraryTarget: 'commonjs2',
-            filename: '[name].js',
-        },
-        resolve: {
-            extensions,
-
-            // Resolve {N} system modules from tns-core-modules
-            modules: [
-                'node_modules/tns-core-modules',
-                'node_modules',
-            ],
-
-            alias: {
-                '~': resolve('./app')
-            },
-        },
-        node: {
-            // Disable node shims that conflict with NativeScript
-            'http': false,
-            'timers': false,
-            'setImmediate': false,
-            'fs': 'empty',
-        },
-        module: { rules },
-        plugins,
-    };
-
-    if (env.snapshot) {
-        plugins.push(new nsWebpack.NativeScriptSnapshotPlugin({
-            chunk: 'vendor',
-            projectRoot: __dirname,
-            webpackConfig: config,
-            targetArchs: ['arm', 'arm64', 'ia32'],
-            tnsJavaClassesOptions: { packages: ['tns-core-modules' ] },
-            useLibs: false
-        }));
-    }
-
-    return config;
-};
-
-
-function getPlatform(env) {
-    return env.android ? 'android' :
-        env.ios ? 'ios' :
-        () => { throw new Error('You need to provide a target platform!') };
-}
-
-function getRules() {
-    return [
-        {
-            test: /\.html$|\.xml$/,
-            use: [
-                'raw-loader',
-            ]
-        },
-        // Root stylesheet gets extracted with bundled dependencies
-        {
-            test: new RegExp(mainSheet),
-            use: ExtractTextPlugin.extract([
-                {
-                    loader: 'resolve-url-loader',
-                    options: { silent: true },
-                },
-                {
-                    loader: 'nativescript-css-loader',
-                    options: { minimize: false }
-                },
-                'nativescript-dev-webpack/platform-css-loader',
-            ]),
-        },
-        // Other CSS files get bundled using the raw loader
-        {
-            test: /\.css$/,
-            exclude: new RegExp(mainSheet),
-            use: [
-                'raw-loader',
-            ]
-        },
-        // SASS support
-        {
-            test: /\.scss$/,
-            use: [
-                'raw-loader',
-                'resolve-url-loader',
-                'sass-loader',
-            ]
-        },
-
+        // Angular components reference css files and their imports using raw-loader
+        { test: /\.css$/, exclude: /\/app\.css$/, use: 'raw-loader' },
+        { test: /\.scss$/, exclude: /\/app\.scss$/, use: ['raw-loader', 'resolve-url-loader', 'sass-loader'] },
 
         // Compile TypeScript files with ahead-of-time compiler.
         {
-            test: /.ts$/,
-            use: [
-                { loader: 'nativescript-dev-webpack/tns-aot-loader' },
-                {
-                    loader: '@ngtools/webpack',
-                    options: ngToolsWebpackOptions,
-                },
-                { loader : 'angular-router-loader?aot=true' }
-            ]
+          test: /.ts$/, use: [
+            'nativescript-dev-webpack/moduleid-compat-loader',
+            { loader: '@ngtools/webpack', options: ngToolsWebpackOptions },
+            { loader: 'angular-router-loader?aot=true' }
+          ]
         },
-        {
-          test : /\.json$/,
-          use :  [{ loader : 'json-loader' }]
-        }
-    ];
-}
+        { test: /\.json$/, use: [{ loader: 'json-loader' }] }
+      ],
+    },
+    plugins: [
+      // Vendor libs go to the vendor.js chunk
+      new webpack.optimize.CommonsChunkPlugin({
+        name: ['vendor'],
+        filename: `vendor_${cacheBusterTimestamp}.js`
+      }),
+      // Define useful constants like TNS_WEBPACK
+      new webpack.DefinePlugin({
+        'global.TNS_WEBPACK': 'true',
+      }),
+      // Copy assets to out dir. Add your own globs as needed.
+      new CopyWebpackPlugin(
+        [
+          { from: 'App_Resources/**' },
+          { from: 'assets/**' },
+          { from: 'fonts/**' },
+          { from: '**/*.jpg' },
+          { from: '**/*.png' },
+          { from: '**/*.xml' }
+          ],
+        // usually used for local json file 
+        // if testing out wip backend apis
+        { ignore: ['assets/json/**'] }
+      ),
 
-function getPlugins(platform, env) {
-    let plugins = [
-        new ExtractTextPlugin(`app.${platform}.css`),
-
-        // Vendor libs go to the vendor.js chunk
-        new webpack.optimize.CommonsChunkPlugin({
-            name: ['vendor'],
-        }),
-
-        // Define useful constants like TNS_WEBPACK
-        new webpack.DefinePlugin({
-            'global.TNS_WEBPACK': 'true',
-        }),
-
-        // Copy assets to out dir. Add your own globs as needed.
-        new CopyWebpackPlugin([
-            { from : 'assets/**' },
-            {
-              from : `app.${platform}.css`,
-              to :   'app.css'
-            },
-            { from : 'fonts/**' },
-            { from: '**/*.jpg' },
-            { from: '**/*.png' },
-            { from: '**/*.xml' },
-        ], { ignore: ['App_Resources/**'] }),
-
-        // Generate a bundle starter script and activate it in package.json
-        new nsWebpack.GenerateBundleStarterPlugin([
-            './vendor',
-            './bundle',
-        ]),
-
-        // Support for web workers since v3.2
-        new NativeScriptWorkerPlugin(),
-
-        // Generate report files for bundles content
-        new BundleAnalyzerPlugin({
-            analyzerMode: 'static',
-            openAnalyzer: false,
-            generateStatsFile: true,
-            reportFilename: join(__dirname, 'report', `report.html`),
-            statsFilename: join(__dirname, 'report', `stats.json`),
-        }),
-
-        // Angular AOT compiler
-        new AotPlugin(
-            Object.assign({
-                entryModule: resolve(__dirname, 'app/app.module#AppModule'),
-                typeChecking: false
-            }, ngToolsWebpackOptions)
-        ),
-
-        // Resolve .ios.css and .android.css component stylesheets, and .ios.html and .android component views
-        new nsWebpack.UrlResolvePlugin({
-            platform: platform,
-            resolveStylesUrls: true,
-            resolveTemplateUrl: true
-        }),
-
-    ];
-
-    if (env.uglify) {
-      plugins.push(new webpack.LoaderOptionsPlugin({ minimize: true }));
-      plugins.push(new ParallelUglifyPlugin({
-        workerCount : os.cpus().length,
-        'uglifyJS' :  {
-          mangle :   {
-            reserved : nsWebpack.uglifyMangleExcludes
+      // Generate a bundle starter script and activate it in package.json
+      new nsWebpack.GenerateBundleStarterPlugin([
+        `./vendor_${cacheBusterTimestamp}`,
+        `./bundle_${cacheBusterTimestamp}`
+      ]),
+      // Support for web workers since v3.2
+      new NativeScriptWorkerPlugin(),
+      // AngularCompilerPlugin with augmented NativeScript filesystem to handle platform specific resource resolution.
+      new nsWebpack.NativeScriptAngularCompilerPlugin(
+        Object.assign({
+          entryModule: resolve(__dirname, 'app/app.module#AppModule'),
+          skipCodeGeneration: !aot,
+          platformOptions: {
+            platform,
+            platforms,
+            // ignore: ['App_Resources']
           },
-          // Work around an Android issue by setting compress = false
-          compress : platform !== 'android'
-        }
-      }));
-    }
-
-    return plugins;
-}
-
-// Resolve platform-specific modules like module.android.js
-function getExtensions(platform) {
-    return Object.freeze([
-        `.${platform}.ts`,
-        `.${platform}.js`,
-        '.aot.ts',
-        '.ts',
-        '.js',
-        '.css',
-        `.${platform}.css`,
-    ]);
-}
+        }, ngToolsWebpackOptions)
+      ),
+      // Does IPC communication with the {N} CLI to notify events when running in watch mode.
+      new nsWebpack.WatchStateLoggerPlugin(),
+    ],
+  };
+  if ( report ) {
+    // Generate report files for bundles content
+    config.plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false,
+      generateStatsFile: true,
+      reportFilename: join(__dirname, 'report', `report.html`),
+      statsFilename: join(__dirname, 'report', `stats.json`),
+    }));
+  }
+  if ( snapshot ) {
+    config.plugins.push(new nsWebpack.NativeScriptSnapshotPlugin({
+      chunk: 'vendor',
+      projectRoot: __dirname,
+      webpackConfig: config,
+      targetArchs: ['arm', 'arm64', 'ia32'],
+      tnsJavaClassesOptions: { packages: ['tns-core-modules'] },
+      useLibs: false
+    }));
+  }
+  if ( uglify ) {
+    // config.plugins.push(new webpack.LoaderOptionsPlugin({ minimize: true }));
+    config.plugins.push(new ParallelUglifyPlugin({
+      workerCount: os.cpus().length,
+      uglifyES: {
+        compress: platform !== 'android',
+        mangle: {
+          reserved: nsWebpack.uglifyMangleExcludes.concat(dropDownMangleExcludes)
+        },
+        ecma: 6,
+        safari10: platform !== 'android',
+        warnings: 'verbose',
+      }
+    }));
+  }
+  return config;
+};

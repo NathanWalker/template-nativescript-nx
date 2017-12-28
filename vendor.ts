@@ -1,3 +1,10 @@
+// Snapshot the ~/app.css and the theme
+import * as application from 'tns-core-modules/application';
+import 'ui/styling/style-scope';
+const appCssContext = require.context("~/", false, /^\.\/app\.(css|scss|less|sass)$/);
+global.registerWebpackModules(appCssContext);
+application.loadAppCss();
+
 import './vendor-platform';
 
 import 'reflect-metadata';

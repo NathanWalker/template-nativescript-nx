@@ -1,10 +1,9 @@
 // angular
-import { NgModule, NgModuleFactoryLoader, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 
 // nativescript
 import { NativeScriptModule } from 'nativescript-angular/nativescript.module';
 import { NativeScriptHttpModule } from 'nativescript-angular/http';
-import { NSModuleFactoryLoader } from 'nativescript-angular/router';
 
 // app
 import { CoreModule } from './modules/core/core.module';
@@ -19,13 +18,6 @@ import { AppComponent } from './app.component';
     CoreModule,
     SharedModule,
     AppRoutingModule
-  ],
-  providers: [
-    // this allows standard Angular route lazy load syntax across whole project
-    {
-      provide: NgModuleFactoryLoader,
-      useClass: NSModuleFactoryLoader
-    }
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent],

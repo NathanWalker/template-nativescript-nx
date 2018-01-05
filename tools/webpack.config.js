@@ -10,7 +10,6 @@ const { NativeScriptWorkerPlugin } = require('nativescript-worker-loader/NativeS
 
 const os = require('os');
 const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
-const dropDownMangleExcludes = require('nativescript-drop-down/uglify-mangle-excludes').default;
 const cacheBusterTimestamp = Date.now().toString(36);
 
 module.exports = env => {
@@ -158,9 +157,6 @@ module.exports = env => {
       workerCount: os.cpus().length,
       uglifyES: {
         compress: platform !== 'android',
-        mangle: {
-          reserved: nsWebpack.uglifyMangleExcludes.concat(dropDownMangleExcludes)
-        },
         ecma: 6,
         safari10: platform !== 'android',
         warnings: 'verbose',

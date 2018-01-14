@@ -31,7 +31,6 @@
         "@angular/compiler": "file:../../node_modules/@angular/compiler",
         "@angular/core": "file:../../node_modules/@angular/core",
         "@angular/forms": "file:../../node_modules/@angular/forms",
-        "@angular/http": "file:../../node_modules/@angular/http",
         "@angular/platform-browser": "file:../../node_modules/@angular/platform-browser",
         "@angular/platform-browser-dynamic": "file:../../node_modules/@angular/platform-browser-dynamic",
         "@angular/router": "file:../../node_modules/@angular/router",
@@ -48,7 +47,7 @@
         "zone.js": "file:../../node_modules/zone.js"
     },
     "devDependencies": {
-        "@angular/compiler-cli": "file:../../node_modules/@angular/core",
+        "@angular/compiler-cli": "file:../../node_modules/@angular/compiler-cli",
         "@ngtools/webpack": "~1.9.3",
         "angular-router-loader": "~0.8.1",
         "copy-webpack-plugin": "~4.3.0",

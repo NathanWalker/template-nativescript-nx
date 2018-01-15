@@ -3,7 +3,7 @@ import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 
 // nativescript
 import { NativeScriptModule } from 'nativescript-angular/nativescript.module';
-import { NativeScriptHttpModule } from 'nativescript-angular/http';
+import { NativeScriptHttpClientModule } from 'nativescript-angular/http-client';
 
 // app
 import { CoreModule } from './modules/core/core.module';
@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
 @NgModule({
   imports: [
     NativeScriptModule,
-    NativeScriptHttpModule,
+    NativeScriptHttpClientModule,
     CoreModule,
     SharedModule,
     AppRoutingModule

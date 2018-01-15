@@ -14,7 +14,6 @@ import '@angular/platform-browser';
 import '@angular/core';
 import '@angular/common';
 import '@angular/forms';
-import '@angular/http';
 import '@angular/router';
 
 // ng libs
@@ -26,7 +25,7 @@ import '@ngrx/router-store';
 import 'nativescript-angular/platform-static';
 import 'nativescript-angular/common';
 import 'nativescript-angular/forms';
-import 'nativescript-angular/http';
+import 'nativescript-angular/http-client';
 import 'nativescript-angular/router';
 
 // shared libs across all apps in Nx workspace
